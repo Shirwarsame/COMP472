@@ -23,7 +23,7 @@ all_docs, all_labels = read_documents('all_sentiment_shuffled.txt')
 # Transforming a list of list into a list of Strings
 all_docs = [' '.join(ele) for ele in all_docs]
 
-split_point = int(0.60*len(all_docs))
+split_point = int(0.75*len(all_docs))
 train_docs = all_docs[:split_point]
 train_labels = all_labels[:split_point]
 eval_docs = all_docs[split_point:]
@@ -55,7 +55,7 @@ def plot_pie(labels):
 
     plt.show()
 
-plot_pie(all_labels)
+plot_bar(all_labels)
 
 #==============================================================================
 #================================TODO Section==================================
@@ -105,9 +105,9 @@ print(clf_nb1)
 predicted_nb1 = classify_nb(eval_docs, clf_nb1)
 print(predicted_nb1)
 
-#eval1, metric1 = accuracy(eval_labels, predicted_nb1)
-#print(eval1)
-#print(metric1)
+eval1, metric1 = accuracy(eval_labels, predicted_nb1)
+print(eval1)
+print(metric1)
 
 # Base Decision Tree ML algo
 def train_base_DT(documents, labels):
@@ -129,3 +129,36 @@ def train_best_DT(documents, labels):
 
     model = DecisionTreeClassifier().fit(X_train_tfidf, labels)
     return model
+
+def report(filename, eval_labels, prediction):
+    f = open(filename + ".txt", "w")
+    eval1, metric1 = accuracy(eval_labels, prediction)
+    f.write('---------------\n' + filename +'\n' + '---------------\n\n')
+    f.write('---------------\n' + 'Accuracy\n' + '---------------\n')
+    f.write(str(eval1) + '\n\n')
+    f.write('---------------\n' + 'Performance Analysis\n' + '---------------\n')
+    f.write(str(metric1) + '\n\n')
+    f.write('---------------\n' + 'Confusion Matrix\n' + '---------------\n')
+    f.write(str(metrics.confusion_matrix(eval_labels, prediction)) + "\n\n")
+    f.write('---------------\n' + 'Evaluation\n' + '---------------\n')
+    for i in range(len(prediction)):
+        f.write(str(i) + ', ')
+        if prediction[i] == 'pos':
+            f.write('1')
+        elif prediction[i] == 'neg':
+            f.write('0')
+        else:
+            f.write('E')
+        f.write('\n')
+    f.close()
+
+print(predicted_nb1)
+report("NaiveBayes_all_sentiment_shuffled", eval_labels, predicted_nb1)
+
+clf_base_dt = train_base_DT(train_docs, train_labels)
+predicted_base_dt = classify_nb(eval_docs, clf_base_dt)
+report("Base_DT_all_sentiment_shuffled", eval_labels, predicted_base_dt)
+
+clf_best_dt = train_best_DT(train_docs, train_labels)
+predicted_best_dt = classify_nb(eval_docs, clf_best_dt)
+report("Best_DT_all_sentiment_shuffled", eval_labels, predicted_best_dt)
