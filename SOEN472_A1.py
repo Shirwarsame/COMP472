@@ -6,7 +6,6 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
-from collections import Counter
 
 
 def read_documents(doc_file):
@@ -70,11 +69,11 @@ plot_pie(all_labels)
 #Some methods extracted from the previous code to fit the appendex construction
 #==============================================================================
 
+vectorizer = CountVectorizer()
 
 def train_nb(documents, labels):
     # This function trains the Naive-Bayes model with training data (documents and lables)
     # and returns a classifier. The instance of the NB used is the multinominal.
-    vectorizer = CountVectorizer()
     X_train_counts = vectorizer.fit_transform(documents)
 
     tfidf_transformer = TfidfTransformer()
@@ -89,10 +88,9 @@ def score_doc_label(document, label, classifier):
 
 def classify_nb(document, classifier):
     # This function predicts the label of a document based on the classifier passed
-    vectorizer = CountVectorizer()
     X_eval_counts = vectorizer.transform(document)
     predicted = classifier.predict(X_eval_counts)
-    return
+    return predicted
 
 def accuracy(true_labels, guessed_labels):
     # This function evaluates the accuracy of a classifier by compated the true labels to the guessed labels
@@ -102,13 +100,14 @@ def accuracy(true_labels, guessed_labels):
 
 # Example of the usage of the functions defined above (driver example)
 clf_nb1 = train_nb(train_docs, train_labels)
+print(clf_nb1)
 
 predicted_nb1 = classify_nb(eval_docs, clf_nb1)
 print(predicted_nb1)
 
-eval1, metric1 = accuracy(eval_labels, predicted_nb1)
-print(eval1)
-print(metric1)
+#eval1, metric1 = accuracy(eval_labels, predicted_nb1)
+#print(eval1)
+#print(metric1)
 
 # Base Decision Tree ML algo
 def train_base_DT(documents, labels):
