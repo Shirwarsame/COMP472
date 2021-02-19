@@ -4,6 +4,7 @@ from codecs import open
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 from collections import Counter
 
@@ -21,7 +22,7 @@ def read_documents(doc_file):
 all_docs, all_labels = read_documents('all_sentiment_shuffled.txt')
 
 # Transforming a list of list into a list of Strings
-all_docs = [' '.join(ele) for ele in all_docs] 
+all_docs = [' '.join(ele) for ele in all_docs]
 
 split_point = int(0.60*len(all_docs))
 train_docs = all_docs[:split_point]
@@ -29,50 +30,33 @@ train_labels = all_labels[:split_point]
 eval_docs = all_docs[split_point:]
 eval_labels = all_labels[split_point:]
 
-# Counting the amount of 'neg' or 'pos' labels
-freq_label = Counter()
-for doc in all_labels:
-    freq_label[doc] += 1
+def plot_bar(labels):
+    unique_labels = sorted(list(set(labels)))
+    counts = [labels.count(label) for label in unique_labels]
+    plt.bar(unique_labels, counts, color=['red', 'blue', 'purple', 'green'])
 
-# Graphing the labels
-plt.style.use('ggplot')
-x_pos = [i for i, _ in enumerate(['neg', 'pos'])]
-plt.bar(x_pos, [freq_label['neg'], freq_label['pos']], color='green')
-x = [freq_label['neg'], freq_label['pos']]
-plt.xticks(x_pos, x)
-plt.show()
+    for i, v in enumerate(counts):
+        plt.text(plt.xticks()[0][i] - 0.10, v + 50, str(v))
 
-# Vectorizing the train documents
-vectorizer = CountVectorizer()
-X_train_counts = vectorizer.fit_transform(train_docs)
+    plt.title("Frequency of Sentiments")
+    plt.xlabel("Sentiment")
+    plt.ylabel("Frequency")
+    plt.show()
 
-# Transforming occurences into fequencies (avoid discrepancies between short and long documents)
-tfidf_transformer = TfidfTransformer()
-X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
 
-# Training the NB model into a classifier - Multinominal instance
-# clf_freq is using the transformed into frequencies version of the vector
-# clf is using the vector of the train documents without frequency normalization
-clf_freq = MultinomialNB().fit(X_train_tfidf, train_labels)
-clf = MultinomialNB().fit(X_train_counts, train_labels)
+def plot_pie(labels):
+    unique_labels = sorted(list(set(labels)))
+    counts = [labels.count(label) for label in unique_labels]
+    total = sum(counts)
+    sizes = [count / total for count in counts]
 
-# Vectorizing the evaluation documents
-X_eval_counts = vectorizer.transform(eval_docs)
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, labels=unique_labels, autopct='%1.1f%%', startangle=90)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-# Predicting the labels for the evaluation documents
-# clf is using the transformed into frequencies version of the vector
-# clf2 is using the vector of the train documents without frequency normalization
-predicted_freq = clf_freq.predict(X_eval_counts)
-predicted = clf.predict(X_eval_counts)
+    plt.show()
 
-# Evaluating our trained model (NB - multinominal)
-evaluation_freq = np.mean(predicted_freq == eval_labels)
-evaluation = np.mean(predicted == eval_labels)
-print(evaluation_freq)
-print(evaluation)
-
-# Printing out the metrics for the report
-print(metrics.classification_report(eval_labels, predicted,list(set(eval_labels))))
+plot_pie(all_labels)
 
 #==============================================================================
 #================================TODO Section==================================
@@ -99,22 +83,21 @@ def train_nb(documents, labels):
     clf_nb = MultinomialNB().fit(X_train_tfidf, labels)
     return(clf_nb)
 
-
 def score_doc_label(document, label, classifier):
     #TODO
     return #Probability of getting those words for a specfic label - see appendex
 
 def classify_nb(document, classifier):
     # This function predicts the label of a document based on the classifier passed
+    vectorizer = CountVectorizer()
     X_eval_counts = vectorizer.transform(document)
     predicted = classifier.predict(X_eval_counts)
     return
 
-
 def accuracy(true_labels, guessed_labels):
     # This function evaluates the accuracy of a classifier by compated the true labels to the guessed labels
     evaluation = np.mean(true_labels == guessed_labels)
-    metric = metrics.classification_report(eval_labels, predicted,list(set(eval_labels)))
+    metric = metrics.classification_report(eval_labels, guessed_labels,list(set(eval_labels)))
     return evaluation, metric
 
 # Example of the usage of the functions defined above (driver example)
@@ -123,6 +106,27 @@ clf_nb1 = train_nb(train_docs, train_labels)
 predicted_nb1 = classify_nb(eval_docs, clf_nb1)
 print(predicted_nb1)
 
-eval1, metric1 = accuracy(eval_labels, predicted)
+eval1, metric1 = accuracy(eval_labels, predicted_nb1)
 print(eval1)
 print(metric1)
+
+# Base Decision Tree ML algo
+def train_base_DT(documents, labels):
+    vectorizer = CountVectorizer()
+    X_train_counts = vectorizer.fit_transform(documents)
+
+    tfidf_transformer = TfidfTransformer()
+    X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
+
+    model = DecisionTreeClassifier(criterion='entropy').fit(X_train_tfidf, labels)
+    return model
+
+def train_best_DT(documents, labels):
+    vectorizer = CountVectorizer()
+    X_train_counts = vectorizer.fit_transform(documents)
+
+    tfidf_transformer = TfidfTransformer()
+    X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
+
+    model = DecisionTreeClassifier().fit(X_train_tfidf, labels)
+    return model
