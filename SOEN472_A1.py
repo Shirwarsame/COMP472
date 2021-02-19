@@ -1,9 +1,12 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from codecs import open
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
+from collections import Counter
+
 
 def read_documents(doc_file):
     docs = []
@@ -25,6 +28,19 @@ train_docs = all_docs[:split_point]
 train_labels = all_labels[:split_point]
 eval_docs = all_docs[split_point:]
 eval_labels = all_labels[split_point:]
+
+# Counting the amount of 'neg' or 'pos' labels
+freq_label = Counter()
+for doc in all_labels:
+    freq_label[doc] += 1
+
+# Graphing the labels
+plt.style.use('ggplot')
+x_pos = [i for i, _ in enumerate(['neg', 'pos'])]
+plt.bar(x_pos, [freq_label['neg'], freq_label['pos']], color='green')
+x = [freq_label['neg'], freq_label['pos']]
+plt.xticks(x_pos, x)
+plt.show()
 
 # Vectorizing the train documents
 vectorizer = CountVectorizer()
