@@ -38,7 +38,7 @@ def find_best_dt_param(x_train_tfidf, labels):
     print("------------------------------------------------------------------------------------")
     print("Looking for the best parameters for Decision Tree...")
 
-    decision_tree = DecisionTreeClassifier(random_state=42)
+    decision_tree = DecisionTreeClassifier()
 
     param_dict = {
         "criterion": ['gini', 'entropy'],
@@ -83,7 +83,6 @@ def main(filename):
 
 
 if __name__ == '__main__':
-    main("all_sentiment_shuffled")
     if len(sys.argv) == 2:
         main(sys.argv[1])
     else:
