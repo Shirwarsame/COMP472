@@ -86,16 +86,16 @@ def classify(document, classifier):
     return predicted
 
 
-def accuracy(true_labels, guessed_labels, eval_labels):
+def accuracy(guessed_labels, eval_labels):
     # This function evaluates the accuracy of a classifier by competed the true labels to the guessed labels
-    evaluation = np.mean(true_labels == guessed_labels)
+    evaluation = np.mean(eval_labels == guessed_labels)
     metric = metrics.classification_report(eval_labels, guessed_labels, list(set(eval_labels)))
     return evaluation, metric
 
 
 def report(filename, eval_labels, prediction):
     f = open(filename + ".txt", "w")
-    eval1, metric1 = accuracy(eval_labels, prediction, eval_labels)
+    eval1, metric1 = accuracy(prediction, eval_labels)
     f.write('---------------\n' + filename + '\n' + '---------------\n\n')
     f.write('---------------\n' + 'Accuracy\n' + '---------------\n')
     f.write(str(eval1) + '\n\n')
