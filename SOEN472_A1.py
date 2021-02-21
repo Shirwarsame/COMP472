@@ -75,7 +75,7 @@ def train_best_dt(documents, labels):
     tfidf_transformer = TfidfTransformer()
     x_train_tfidf = tfidf_transformer.fit_transform(x_train_counts)
 
-    model = DecisionTreeClassifier().fit(x_train_tfidf, labels)
+    model = DecisionTreeClassifier(splitter='best').fit(x_train_tfidf, labels)
     return model
 
 
@@ -121,9 +121,9 @@ def error_report(filename, split_point, all_docs, eval_labels, prediction):
     f.write('---------------\n' + 'Evaluation\n' + '---------------\n')
     for i in range(len(prediction)):
         if prediction[i] != eval_labels[i]:
-            f.write(str(i+split_point+1) + ": real: " + eval_labels[i] + " ; predicted: " + prediction[i])
+            f.write(str(i + split_point + 1) + ": real: " + eval_labels[i] + " ; predicted: " + prediction[i])
             f.write('\n')
-            f.write(all_docs[i+split_point])
+            f.write(all_docs[i + split_point])
             f.write('\n')
     f.close()
 
@@ -149,19 +149,19 @@ def main(filename):
     clf_nb1 = train_nb(train_docs, train_labels)
     predicted_nb1 = classify(eval_docs, clf_nb1)
     report("NaiveBayes_" + filename, eval_labels, predicted_nb1)
-    error_report("Errors-NaiveBayes_" + filename, split_point,all_docs, eval_labels, predicted_nb1)
+    error_report("Errors-NaiveBayes_" + filename, split_point, all_docs, eval_labels, predicted_nb1)
 
     # Base Decision Tree
     clf_base_dt = train_base_dt(train_docs, train_labels)
     predicted_base_dt = classify(eval_docs, clf_base_dt)
     report("Base_DT_" + filename, eval_labels, predicted_base_dt)
-    error_report("Errors-Base_DT_" + filename, split_point,all_docs, eval_labels, predicted_nb1)
+    error_report("Errors-Base_DT_" + filename, split_point, all_docs, eval_labels, predicted_base_dt)
 
     # Best Decision Tree
     clf_best_dt = train_best_dt(train_docs, train_labels)
     predicted_best_dt = classify(eval_docs, clf_best_dt)
     report("Best_DT_" + filename, eval_labels, predicted_best_dt)
-    error_report("Errors-Best_DT_" + filename, split_point,all_docs, eval_labels, predicted_nb1)
+    error_report("Errors-Best_DT_" + filename, split_point, all_docs, eval_labels, predicted_best_dt)
 
 
 if __name__ == '__main__':
