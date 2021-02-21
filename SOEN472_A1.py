@@ -116,6 +116,18 @@ def report(filename, eval_labels, prediction):
     f.close()
 
 
+def error_report(filename, split_point, all_docs, eval_labels, prediction):
+    f = open(filename + ".txt", "w")
+    f.write('---------------\n' + 'Evaluation\n' + '---------------\n')
+    for i in range(len(prediction)):
+        if prediction[i] != eval_labels[i]:
+            f.write(str(i+split_point+1) + ": real: " + eval_labels[i] + " ; predicted: " + prediction[i])
+            f.write('\n')
+            f.write(all_docs[i+split_point])
+            f.write('\n')
+    f.close()
+
+
 def main(filename):
     # (Task 0)
     all_docs, all_labels = read_documents(filename + '.txt')
@@ -137,16 +149,19 @@ def main(filename):
     clf_nb1 = train_nb(train_docs, train_labels)
     predicted_nb1 = classify(eval_docs, clf_nb1)
     report("NaiveBayes_" + filename, eval_labels, predicted_nb1)
+    error_report("Errors-NaiveBayes_" + filename, split_point,all_docs, eval_labels, predicted_nb1)
 
     # Base Decision Tree
     clf_base_dt = train_base_dt(train_docs, train_labels)
     predicted_base_dt = classify(eval_docs, clf_base_dt)
     report("Base_DT_" + filename, eval_labels, predicted_base_dt)
+    error_report("Errors-Base_DT_" + filename, split_point,all_docs, eval_labels, predicted_nb1)
 
     # Best Decision Tree
     clf_best_dt = train_best_dt(train_docs, train_labels)
     predicted_best_dt = classify(eval_docs, clf_best_dt)
     report("Best_DT_" + filename, eval_labels, predicted_best_dt)
+    error_report("Errors-Best_DT_" + filename, split_point,all_docs, eval_labels, predicted_nb1)
 
 
 if __name__ == '__main__':
