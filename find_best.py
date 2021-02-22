@@ -5,7 +5,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 
-from COMP472.SOEN472_A1 import read_documents
+from SOEN472_A1 import read_documents
 
 vector = CountVectorizer()
 

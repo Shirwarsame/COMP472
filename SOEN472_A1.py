@@ -75,7 +75,7 @@ def train_best_dt(documents, labels):
     tfidf_transformer = TfidfTransformer()
     x_train_tfidf = tfidf_transformer.fit_transform(x_train_counts)
 
-    model = DecisionTreeClassifier(max_depth=9, min_samples_split=9, random_state=42).fit(x_train_tfidf, labels)
+    model = DecisionTreeClassifier(max_depth=9, min_samples_leaf=3, min_samples_split=9, splitter='random').fit(x_train_tfidf, labels)
     return model
 
 

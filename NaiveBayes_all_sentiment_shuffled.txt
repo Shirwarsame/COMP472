@@ -12,8 +12,8 @@ Performance Analysis
 ---------------
               precision    recall  f1-score   support
 
-         pos       0.84      0.80      0.82      1153
          neg       0.82      0.86      0.84      1230
+         pos       0.84      0.80      0.82      1153
 
     accuracy                           0.83      2383
    macro avg       0.83      0.83      0.83      2383
